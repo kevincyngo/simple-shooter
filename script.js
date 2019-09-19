@@ -14,6 +14,11 @@ canvasElement.setAttribute("style", "border:solid 1px;");
 var canvas = canvasElement.getContext("2d");
 document.body.appendChild(canvasElement);
 
+const shootSound = document.querySelector(`audio[data-event="shoot"]`);
+shootSound.volume = 0.1;
+const splatSound = document.querySelector(`audio[data-event="splat"]`);
+shootSound.volume = 0.2;
+
 
 class Bullet {
   constructor(x, y, direction) {
@@ -85,6 +90,8 @@ class Player {
     }
     //space
     else if (keyCode === 32) {
+      shootSound.currentTime = 0;
+      shootSound.play();
       this.bullets.push(new Bullet(this.x, this.y, this.direction));
     }
 
@@ -152,19 +159,21 @@ function handleCollisions() {
     enemies.forEach(function(enemy) {
       if (objCollision(bullet, enemy)) {
         // enemy.explode();
+        splatSound.currentTime = 0;
+        splatSound.play();
         enemy.isActive = false;
         bullet.isActive = false;
       }
     });
   });
 
-  // enemies.forEach(function(enemy) {
-    // if (objCollision(enemy, player)) {
-      // player = null;
-  //     enemy.explode();
-  //     player.explode();
-    // }
-  // });
+  enemies.forEach(function(enemy) {
+    if (objCollision(enemy, player)) {
+      var gameover = prompt("game over");
+      // enemy.explode();
+      // player.explode();
+    }
+  });
 }
 
 var player = new Player();
