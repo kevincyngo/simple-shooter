@@ -66,6 +66,8 @@ class Player {
     this.height = 32;
     this.direction = "N";
     this.bullets = [];
+    this.centerX = (this.x + this.width/2);
+    this.centerY = (this.y + this.height/2);
   }
 
   update = (keyCode) => {
@@ -97,6 +99,8 @@ class Player {
 
     this.x = clampSpriteToWalls(this.x, 0, CANVAS_WIDTH - this.width);
     this.y = clampSpriteToWalls(this.y, 0, CANVAS_HEIGHT - this.height);
+    this.centerX = (this.x + this.width/2);
+    this.centerY = (this.y + this.height/2);
   }
 
   draw = () => {
@@ -117,25 +121,28 @@ class Enemy {
     this.direction = "N";
     this.bullets = [];
     this.isActive = true;
+    this.speed = 5;
+    this.centerX = (this.x + this.width/2);
+    this.centerY = (this.y + this.height/2);
   }
 
   update = () => {
-    //decide to move x or y
-    //move x
-    if (Math.floor(Math.random()*2) === 1) {
-      if (this.x < player.x) {
-        this.x += 5;
+
+    if (Math.abs(player.centerX - this.centerX) >= Math.abs(player.centerY - this.centerY)) {
+      if (player.centerX > this.centerX) {
+        this.x += this.speed;
       } else {
-        this.x -= 5;
+        this.x -= this.speed;
       }
-    //move y
     } else {
-      if (this.y < player.y) {
-        this.y += 5;
-      } else {
-        this.y -= 5;
+      if (player.centerY > this.centerY) {
+        this.y += this.speed;
+      }else {
+        this.y -= this.speed;
       }
     }
+    this.centerX = (this.x + this.width/2);
+    this.centerY = (this.y + this.height/2);
   }
 
   draw = () => {
