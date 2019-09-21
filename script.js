@@ -76,12 +76,16 @@ function keyDownListener(event) {
 //TODO: finish shooting direction mechanic
 window.addEventListener('keyup', keyUpListener);
 function keyUpListener(event) {
-  if ((event.key == "w" || event.key == "s")  && keyPresses['a']) {
-    player.vertical = "";
-  } else if ((event.key == "w" || event.key == "s") && keyPresses['d']) {
+  if ((event.key == "w" || event.key == "s") && (keyPresses['d'] || keyPresses['a'])) {
     player.vertical = "";
   } else if ((event.key == "a" || event.key == "d") && (keyPresses['s'] || keyPresses['w'])) {
     player.horizontal = "";
+  } else {
+    if (event.key == "w" || event.key == "s") {
+      player.vertical = event.key;
+    } else if (event.key == "a" || event.key == "d") {
+      player.horizontal = event.key;
+    }
   }
   keyPresses[event.key] = false;
   
