@@ -1,6 +1,6 @@
 var CANVAS_WIDTH = 720;
 var CANVAS_HEIGHT = 480;
-var PLAYER_MOVESPEED = 15;
+var PLAYER_MOVESPEED = 5;
 var DIFFICULTY = prompt("ENTER DIFFICULTY",1);
 
 var enemies = [];
@@ -21,26 +21,29 @@ shootSound.volume = 0.2;
 
 
 class Bullet {
-  constructor(x, y, direction) {
+  constructor(x, y, horizontal, vertical) {
     this.color = "#AAA";
     this.x = x;
     this.y = y;
     this.width = 15;
     this.height = 15;
-    this.direction = direction;
+    this.horizontal = horizontal;
+    this.vertical = vertical;
     this.isActive = true;
   }
 
   update() {
-    if (this.direction === "N") {
+    if (this.vertical === "w") {
       this.y -= 10;
-    } else if (this.direction === "E") {
-      this.x += 10;
-    } else if (this.direction === "S") {
+    }  else if (this.vertical === "s") {
       this.y += 10;
-    } else if (this.direction === "W") {
+    }
+    if (this.horizontal === "d") {
+      this.x += 10;
+    } else if (this.horizontal === "a") {
       this.x -= 10;
     }
+    // console.log(this.direction);
   }
 
   draw() {
@@ -57,6 +60,33 @@ class Bullet {
 };
 
 
+let keyPresses = {};
+
+window.addEventListener('keydown', keyDownListener);
+function keyDownListener(event) {
+    if (event.keyCode === 32) {
+      shootSound.currentTime = 0;
+      shootSound.play();
+      // console.log(this.direction);
+      player.bullets.push(new Bullet(player.x, player.y, player.horizontal, player.vertical));
+    } else {
+    keyPresses[event.key] = true;
+  }
+}
+//TODO: finish shooting direction mechanic
+window.addEventListener('keyup', keyUpListener);
+function keyUpListener(event) {
+  if ((event.key == "w" || event.key == "s")  && keyPresses['a']) {
+    player.vertical = "";
+  } else if ((event.key == "w" || event.key == "s") && keyPresses['d']) {
+    player.vertical = "";
+  } else if ((event.key == "a" || event.key == "d") && (keyPresses['s'] || keyPresses['w'])) {
+    player.horizontal = "";
+  }
+  keyPresses[event.key] = false;
+  
+}
+
 class Player {
   constructor() {
     this.color = "#00A";
@@ -64,37 +94,27 @@ class Player {
     this.y = 270;
     this.width = 32;
     this.height = 32;
-    this.direction = "N";
+    this.vertical = "";
+    this.horizontal = "d";
     this.bullets = [];
     this.centerX = (this.x + this.width/2);
     this.centerY = (this.y + this.height/2);
   }
 
-  update = (keyCode) => {
-    if (keyCode === 37) {
-      this.x -= PLAYER_MOVESPEED;
-      this.direction = "W";
-    }
-    //up
-    else if (keyCode === 38) {
+  gameLoop = () => {
+    if (keyPresses.w) {
       this.y -= PLAYER_MOVESPEED;
-      this.direction = "N";
-    }
-    //right
-    else if (keyCode === 39) {
-      this.x += PLAYER_MOVESPEED;
-      this.direction = "E";
-    }
-    //down
-    else if (keyCode === 40) {
+      this.vertical = "w";
+    } else if (keyPresses.s) {
       this.y += PLAYER_MOVESPEED;
-      this.direction = "S";
+      this.vertical = "s";
     }
-    //space
-    else if (keyCode === 32) {
-      shootSound.currentTime = 0;
-      shootSound.play();
-      this.bullets.push(new Bullet(this.x, this.y, this.direction));
+    if (keyPresses.a) {
+      this.x -= PLAYER_MOVESPEED;
+      this.horizontal = "a";
+    } else if (keyPresses.d) {
+      this.x += PLAYER_MOVESPEED;
+      this.horizontal = "d";
     }
 
     this.x = clampSpriteToWalls(this.x, 0, CANVAS_WIDTH - this.width);
@@ -118,7 +138,6 @@ class Enemy {
     this.y = y;
     this.width = 32;
     this.height = 32;
-    this.direction = "N";
     this.bullets = [];
     this.isActive = true;
     this.speed = 5;
@@ -176,7 +195,7 @@ function handleCollisions() {
 
   enemies.forEach(function(enemy) {
     if (objCollision(enemy, player)) {
-      var gameover = prompt("game over");
+      // var gameover = prompt("game over");
       // enemy.explode();
       // player.explode();
     }
@@ -189,6 +208,7 @@ var player = new Player();
 //general update and drawing
 setInterval(function() {
   //updating
+  player.gameLoop();
   player.bullets.forEach(item => item.update());
 
   //check collision
@@ -212,6 +232,5 @@ setInterval(function(){
 },5000/DIFFICULTY);
 
 
-document.addEventListener("keydown", (event) => {
-  player.update(event.keyCode);
-});
+
+
