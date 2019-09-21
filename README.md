@@ -1,4 +1,4 @@
-#Simple shooting game
+# Simple shooting game
 
 * Sept 21, 2019
 	* Completed phase 1
