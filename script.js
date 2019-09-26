@@ -1,7 +1,8 @@
-var CANVAS_WIDTH = 720;
-var CANVAS_HEIGHT = 480;
-var PLAYER_MOVESPEED = 5;
-var DIFFICULTY = prompt("ENTER DIFFICULTY",1);
+const CANVAS_WIDTH = 720;
+const CANVAS_HEIGHT = 480;
+const PLAYER_MOVESPEED = 5;
+const BULLET_SIZE = 15;
+var DIFFICULTY = prompt("ENTER DIFFICULTY", 1);
 
 var enemies = [];
 var FPS = 30;
@@ -25,8 +26,8 @@ class Bullet {
     this.color = "#AAA";
     this.x = x;
     this.y = y;
-    this.width = 15;
-    this.height = 15;
+    this.width = BULLET_SIZE;
+    this.height = BULLET_SIZE;
     this.horizontal = horizontal;
     this.vertical = vertical;
     this.isActive = true;
@@ -35,7 +36,7 @@ class Bullet {
   update() {
     if (this.vertical === "w") {
       this.y -= 10;
-    }  else if (this.vertical === "s") {
+    } else if (this.vertical === "s") {
       this.y += 10;
     }
     if (this.horizontal === "d") {
@@ -55,7 +56,7 @@ class Bullet {
     if (this.y <= 0 || this.y >= CANVAS_HEIGHT || this.x <= 0 || this.x >= CANVAS_WIDTH) {
       this.isActive = false;
     }
-   
+
   }
 };
 
@@ -64,12 +65,12 @@ let keyPresses = {};
 
 window.addEventListener('keydown', keyDownListener);
 function keyDownListener(event) {
-    if (event.keyCode === 32) {
-      shootSound.currentTime = 0;
-      shootSound.play();
-      // console.log(this.direction);
-      player.bullets.push(new Bullet(player.x, player.y, player.horizontal, player.vertical));
-    } else {
+  if (event.keyCode === 32) {
+    shootSound.currentTime = 0;
+    shootSound.play();
+    // console.log(this.direction);
+    player.bullets.push(new Bullet(player.centerX - BULLET_SIZE/2, player.centerY - BULLET_SIZE/2, player.horizontal, player.vertical));
+  } else {
     keyPresses[event.key] = true;
   }
 }
@@ -88,7 +89,7 @@ function keyUpListener(event) {
     }
   }
   keyPresses[event.key] = false;
-  
+
 }
 
 class Player {
@@ -101,8 +102,8 @@ class Player {
     this.vertical = "";
     this.horizontal = "d";
     this.bullets = [];
-    this.centerX = (this.x + this.width/2);
-    this.centerY = (this.y + this.height/2);
+    this.centerX = (this.x + this.width / 2);
+    this.centerY = (this.y + this.height / 2);
   }
 
   gameLoop = () => {
@@ -123,8 +124,8 @@ class Player {
 
     this.x = clampSpriteToWalls(this.x, 0, CANVAS_WIDTH - this.width);
     this.y = clampSpriteToWalls(this.y, 0, CANVAS_HEIGHT - this.height);
-    this.centerX = (this.x + this.width/2);
-    this.centerY = (this.y + this.height/2);
+    this.centerX = (this.x + this.width / 2);
+    this.centerY = (this.y + this.height / 2);
   }
 
   draw = () => {
@@ -145,8 +146,8 @@ class Enemy {
     this.bullets = [];
     this.isActive = true;
     this.speed = 5;
-    this.centerX = (this.x + this.width/2);
-    this.centerY = (this.y + this.height/2);
+    this.centerX = (this.x + this.width / 2);
+    this.centerY = (this.y + this.height / 2);
   }
 
   update = () => {
@@ -160,12 +161,12 @@ class Enemy {
     } else {
       if (player.centerY > this.centerY) {
         this.y += this.speed;
-      }else {
+      } else {
         this.y -= this.speed;
       }
     }
-    this.centerX = (this.x + this.width/2);
-    this.centerY = (this.y + this.height/2);
+    this.centerX = (this.x + this.width / 2);
+    this.centerY = (this.y + this.height / 2);
   }
 
   draw = () => {
@@ -184,9 +185,9 @@ var randomEnemyPosition = () => new Enemy(Math.floor(Math.random() * Math.floor(
 
 
 function handleCollisions() {
-  player.bullets.forEach(function(bullet) {
+  player.bullets.forEach(function (bullet) {
     bullet.wallCollision();
-    enemies.forEach(function(enemy) {
+    enemies.forEach(function (enemy) {
       if (objCollision(bullet, enemy)) {
         // enemy.explode();
         splatSound.currentTime = 0;
@@ -197,7 +198,7 @@ function handleCollisions() {
     });
   });
 
-  enemies.forEach(function(enemy) {
+  enemies.forEach(function (enemy) {
     if (objCollision(enemy, player)) {
       // var gameover = prompt("game over");
       // enemy.explode();
@@ -210,7 +211,7 @@ var player = new Player();
 
 
 //general update and drawing
-setInterval(function() {
+setInterval(function () {
   //updating
   player.gameLoop();
   player.bullets.forEach(item => item.update());
@@ -228,12 +229,12 @@ setInterval(function() {
   enemies.forEach(item => item.draw());
 
   player.bullets.forEach(item => item.draw());
-}, 1000/FPS);
+}, 1000 / FPS);
 
 //spawn rate of enemies
-setInterval(function(){
+setInterval(function () {
   enemies.push(randomEnemyPosition());
-},5000/DIFFICULTY);
+}, 5000 / DIFFICULTY);
 
 
 
