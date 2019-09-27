@@ -12,3 +12,8 @@ canvas {
 	display: inline-block;
 	background: white;
 }
+
+#info {
+	color: white;
+	font-size: 20px;
+}
